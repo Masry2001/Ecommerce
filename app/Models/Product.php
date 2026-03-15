@@ -1,0 +1,207 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+
+class Product extends Model
+{
+    use HasUuids;
+    use SoftDeletes;
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $table = 'products';
+
+    protected $fillable = [
+        'category_id',
+        'brand_id',
+        'name',
+        'slug',
+        'sku',
+        'short_descirption',
+        'description',
+        'price',
+        'compare_price',
+        'cost_price',
+        'stock_quantity',
+        'low_stock_threshold',
+        'manage_stock',
+        'stock_status',
+        'is_active',
+        'is_featured',
+        'has_variants',
+        'weight',
+        'meta_title',
+        'meta_description',
+        'views_count',
+    ];
+
+    //casts
+    protected $casts = [
+        'price' => 'decimal:2',
+        'compare_price' => 'decimal:2',
+        'cost_price' => 'decimal:2',
+        'stock_quantity' => 'integer',
+        'low_stock_threshold' => 'integer',
+        'manage_stock' => 'boolean',
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
+        'has_variants' => 'boolean',
+        'weight' => 'decimal:2',
+        'views_count' => 'integer',
+    ];
+
+    // local scopes
+
+    #[Scope]
+    protected function inCategory(Builder $query, string $category_id)
+    {
+        return $query->where('category_id', $category_id);
+    }
+
+    #[Scope]
+    protected function ofBrand(Builder $query, string $brand_id)
+    {
+        return $query->where('brand_id', $brand_id);
+    }
+
+    #[Scope]
+    public function active(Builder $query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    #[Scope]
+    public function featured(Builder $query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    #[Scope]
+    public function inStock(Builder $query)
+    {
+        return $query->where('stock_status', 'in_stock')->where('stock_quantity', '>', 0);
+    }
+
+    #[Scope]
+    public function outOfStock(Builder $query)
+    {
+        return $query->where('stock_status', 'out_of_stock')->where('stock_quantity', 0);
+    }
+
+    #[Scope]
+    public function lowStock(Builder $query)
+    {
+        return $query->where('stock_status', 'low_stock')->where('stock_quantity', '<=', 'low_stock_threshold')->where('stock_quantity', '>', 0);
+    }
+
+    #[Scope]
+    public function onBackorder(Builder $query)
+    {
+        return $query->where('stock_status', 'on_backorder');
+    }
+
+    #[Scope]
+    protected function inPriceRange(Builder $query, float $min, float $max)
+    {
+        return $query->whereBetween('price', [$min, $max]);
+    }
+
+    #[Scope]
+    public function hasVariants(Builder $query)
+    {
+        return $query->where('has_variants', true);
+    }
+
+    #[Scope]
+    public function hasNoVariants(Builder $query)
+    {
+        return $query->where('has_variants', false);
+    }
+
+    #[Scope]
+    public function withLowStock(Builder $query)
+    {
+        return $query->where('stock_quantity', '<', 'low_stock_threshold');
+    }
+
+    #[Scope]
+    public function withoutLowStock(Builder $query)
+    {
+        return $query->where('stock_quantity', '>=', 'low_stock_threshold');
+    }
+
+    #[Scope]
+    public function withManageStock(Builder $query)
+    {
+        return $query->where('manage_stock', true);
+    }
+
+    #[Scope]
+    public function withoutManageStock(Builder $query)
+    {
+        return $query->where('manage_stock', false);
+    }
+
+    #[Scope]
+    public function withStockStatus(Builder $query, string $status)
+    {
+        return $query->where('stock_status', $status);
+    }
+
+    #[Scope]
+    public function withoutStockStatus(Builder $query, string $status)
+    {
+        return $query->where('stock_status', '!=', $status);
+    }
+
+
+    // Relations
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    public function pirmaryImage()
+    {
+        return $this->hasOne(ProductImage::class)->where('is_primary', true);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function approvedReviews()
+    {
+        return $this->hasMany(Review::class)->where('is_approved', true);
+    }
+
+    public function pendingReviews()
+    {
+        return $this->hasMany(Review::class)->where('is_approved', false);
+    }
+
+    // Helper methods
+
+}
