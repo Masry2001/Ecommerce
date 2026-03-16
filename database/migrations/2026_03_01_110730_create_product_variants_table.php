@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('product_id')->constrained('products', 'id')->cascadeOnDelete();
             $table->string('sku', 20)->unique();
+            $table->string('name', 50);
             $table->json('options');
             $table->decimal('price', 10, 2);
             $table->decimal('compare_price', 10, 2)->nullable();

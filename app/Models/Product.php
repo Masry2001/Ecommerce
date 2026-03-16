@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -203,5 +204,47 @@ class Product extends Model
     }
 
     // Helper methods
+    public function getDiscountPercentageAttribute()
+    {
+        if ($this->compare_price && $this->compare_price > $this->price) {
+            return round(($this->compare_price - $this->price) / $this->compare_price * 100);
+        }
+        return 0;
+    }
 
+    public function getAverageRatingAttribute()
+    {
+        return round($this->approvedReviews()->avg('rating'), 1);
+    }
+
+    public function getReviewsCountAttribute()
+    {
+        return $this->approvedReviews()->count();
+    }
+
+    public function incrementViewsCount()
+    {
+        $this->increment('views_count');
+    }
+
+    // Events
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (Product $product) {
+            if (empty($product->slug)) {
+                $product->slug = Str::slug($product->name);
+            }
+            if (empty($product->sku)) {
+                $product->sku = 'SKU-' . strtoupper(Str::random(8));
+            }
+        });
+
+        static::updating(function (Product $product) {
+            if (empty($product->slug) && $product->isDirty('name')) {
+                $product->slug = Str::slug($product->name);
+            }
+        });
+    }
 }
