@@ -14,12 +14,12 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use App\Models\OrderStatusHistory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
-    use HasUuids;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles, HasUuids;
     public $incrementing = false;
     protected $keyType = 'string';
     protected $table = 'users';
