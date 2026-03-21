@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('slug', 20)->unique();
             $table->string('name', 20);
-            $table->text('description')->nullable();
+            $table->string('description', 5000)->nullable();
             $table->string('logo')->nullable();
             $table->string('website')->nullable();
             $table->smallInteger('sort_order')->default(0);

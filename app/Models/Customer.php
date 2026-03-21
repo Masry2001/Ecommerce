@@ -34,12 +34,15 @@ class Customer extends Model
         'remember_token',
     ];
 
-    protected $casts = [
-        'date_of_birth' => 'date',
-        'is_active' => 'boolean',
-        'password' => 'hashed',
-        'email_verified_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'date_of_birth' => 'date',
+            'is_active' => 'boolean',
+            'password' => 'hashed',
+            'email_verified_at' => 'datetime',
+        ];
+    }
 
     #[Scope]
     public function active(Builder $query)

@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Categories\Tables;
+namespace App\Filament\Resources\Coupons\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class CategoriesTable
+class CouponsTable
 {
     public static function configure(Table $table): Table
     {
@@ -20,13 +18,30 @@ class CategoriesTable
                 TextColumn::make('id')
                     ->label('ID')
                     ->searchable(),
-                TextColumn::make('slug')
+                TextColumn::make('code')
                     ->searchable(),
-                TextColumn::make('name')
-                    ->searchable(),
-                ImageColumn::make('image'),
-                TextColumn::make('sort_order')
+                TextColumn::make('type')
+                    ->badge(),
+                TextColumn::make('value')
                     ->numeric()
+                    ->sortable(),
+                TextColumn::make('min_order_value')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('max_discount')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('usage_limit')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('usage_limit_per_customer')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('starts_at')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('expires_at')
+                    ->dateTime()
                     ->sortable(),
                 IconColumn::make('is_active')
                     ->boolean(),
@@ -44,7 +59,6 @@ class CategoriesTable
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('key', 64)->unique();  // e.g. 'site_name'
-            $table->text('value')->nullable(); // e.g. 'My Super Shop'
+            $table->string('value', 5000)->nullable(); // e.g. 'My Super Shop'
             $table->string('type', 20)->default('string'); // Helps you cast to boolean/int in PHP
             $table->string('group', 32)->default('general'); // e.g. 'seo', 'social', 'contact'
 

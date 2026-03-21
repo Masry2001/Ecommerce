@@ -24,8 +24,8 @@ class CategoryResource extends Resource
     protected static string | UnitEnum | null $navigationGroup = 'Catalog';
 
 
-    protected static ?string $recordTitleAttribute = 'name';
-
+    protected static ?string $recordTitleAttribute = 'slug';
+    protected static int $globalSearchResultsLimit = 5; // Show only top 5 (Saves database memory)
     public static function form(Schema $schema): Schema
     {
         return CategoryForm::configure($schema);

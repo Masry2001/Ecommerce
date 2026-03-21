@@ -165,42 +165,42 @@ class Product extends Model
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
     public function brand()
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(Brand::class, 'brand_id', 'id');
     }
 
     public function variants()
     {
-        return $this->hasMany(ProductVariant::class);
+        return $this->hasMany(ProductVariant::class, 'product_id', 'id');
     }
 
     public function images()
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->hasMany(ProductImage::class, 'product_id', 'id')->orderBy('sort_order', 'asc');
     }
 
     public function pirmaryImage()
     {
-        return $this->hasOne(ProductImage::class)->where('is_primary', true);
+        return $this->hasOne(ProductImage::class, 'product_id', 'id')->where('is_primary', true);
     }
 
     public function reviews()
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Review::class, 'product_id', 'id');
     }
 
     public function approvedReviews()
     {
-        return $this->hasMany(Review::class)->where('is_approved', true);
+        return $this->hasMany(Review::class, 'product_id', 'id')->where('is_approved', true);
     }
 
     public function pendingReviews()
     {
-        return $this->hasMany(Review::class)->where('is_approved', false);
+        return $this->hasMany(Review::class, 'product_id', 'id')->where('is_approved', false);
     }
 
     // Helper methods
@@ -244,6 +244,19 @@ class Product extends Model
         static::updating(function (Product $product) {
             if (empty($product->slug) && $product->isDirty('name')) {
                 $product->slug = Str::slug($product->name);
+            }
+        });
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($product) {
+            if ($product->stock_quantity == 0) {
+                $product->stock_status = 'out_of_stock';
+            } elseif ($product->stock_quantity <= $product->low_stock_threshold) {
+                $product->stock_status = 'low_stock';
+            } else {
+                $product->stock_status = 'in_stock';
             }
         });
     }

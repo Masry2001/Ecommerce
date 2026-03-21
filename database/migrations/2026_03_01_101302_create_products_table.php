@@ -27,7 +27,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('stock_quantity')->default(0);
             $table->unsignedTinyInteger('low_stock_threshold')->default(10);
             $table->boolean('manage_stock')->default(true);
-            $table->enum('stock_status', ['in_stock', 'out_of_stock', 'low_stock', 'on_backorder'])->default('in_stock');
+            $table->enum('stock_status', ['in_stock', 'out_of_stock', 'low_stock', 'on_backorder'])->default('out_of_stock');
             $table->boolean('is_active')->default(true);
             $table->boolean('is_featured')->default(false);
             $table->boolean('has_variants')->default(false);

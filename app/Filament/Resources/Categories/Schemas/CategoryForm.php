@@ -18,14 +18,17 @@ class CategoryForm
                 Section::make('Category Information')
                     ->columnSpanFull()->columns(2)
                     ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(20),
                         TextInput::make('slug')
                             ->unique(ignoreRecord: true)
                             ->visibleOn('edit')
-                            ->readOnly(),
-                        TextInput::make('name')
-                            ->required(),
+                            ->readOnly()
+                            ->maxLength(20),
                         Textarea::make('description')
                             ->default(null)
+                            ->maxLength(5000)
                             ->columnSpanFull(),
                         FileUpload::make('image')
                             ->disk('public')
@@ -35,19 +38,21 @@ class CategoryForm
                             ->preserveFilenames()
                             ->image(),
                     ]),
-                Section::make('Display Settings')->columns(2)->schema([
+                Section::make('Display Settings')->columnSpanFull()->columns(2)->schema([
                     TextInput::make('sort_order')
                         ->required()
                         ->numeric()
                         ->default(0),
                     Toggle::make('is_active')
-                        ->required(),
+                        ->required()
+                        ->default(true),
 
                 ]),
-                Section::make('SEO Settings')->schema([
+                Section::make('SEO Settings')->columnSpanFull()->columns(2)->schema([
                     TextInput::make('meta_title')
                         ->default(null),
-                    TextInput::make('meta_description')
+                    Textarea::make('meta_description')
+                        ->columnSpanFull()
                         ->default(null),
                 ])
             ]);

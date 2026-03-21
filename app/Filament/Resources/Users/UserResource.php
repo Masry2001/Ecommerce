@@ -20,8 +20,8 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'name';
-
+    protected static ?string $recordTitleAttribute = 'email';
+    protected static int $globalSearchResultsLimit = 5; // Show only top 5 (Saves database memory)
     public static function form(Schema $schema): Schema
     {
         return UserForm::configure($schema);
