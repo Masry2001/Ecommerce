@@ -23,7 +23,7 @@ class Product extends Model
         'name',
         'slug',
         'sku',
-        'short_descirption',
+        'short_description',
         'description',
         'price',
         'compare_price',
@@ -175,7 +175,7 @@ class Product extends Model
 
     public function variants()
     {
-        return $this->hasMany(ProductVariant::class, 'product_id', 'id');
+        return $this->hasMany(ProductVariant::class, 'product_id', 'id')->orderBy('sort_order', 'asc');
     }
 
     public function images()
@@ -183,7 +183,7 @@ class Product extends Model
         return $this->hasMany(ProductImage::class, 'product_id', 'id')->orderBy('sort_order', 'asc');
     }
 
-    public function pirmaryImage()
+    public function primaryImage()
     {
         return $this->hasOne(ProductImage::class, 'product_id', 'id')->where('is_primary', true);
     }

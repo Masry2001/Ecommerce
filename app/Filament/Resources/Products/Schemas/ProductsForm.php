@@ -15,6 +15,9 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\KeyValue;
+use Illuminate\Support\Str;
 
 class ProductsForm
 {
@@ -84,7 +87,8 @@ class ProductsForm
                                             ->unique(ignoreRecord: true)
                                             ->placeholder('TSH-BLK-S')
                                             ->helperText('Stock Keeping Unit - Unique identifier for the product, e.g. a small black T-shirt might be TSH-BLK-S')
-                                            ->maxLength(20),
+                                            ->maxLength(20)
+                                            ->live(onBlur: true),
                                         TextInput::make('price')
                                             ->required()
                                             ->helperText('The Selling Price')
@@ -110,7 +114,7 @@ class ProductsForm
                                         Toggle::make('manage_stock')
                                             ->columnSpanFull()
                                             ->required()
-                                            ->default(true)
+                                            ->default(false)
                                             ->helperText('Enable stock management for this product')
                                             ->live()
                                             ->afterStateUpdated(fn($get, $set) => self::refreshStockStatus($get, $set)),
@@ -160,46 +164,113 @@ class ProductsForm
                             ->schema([
                                 Section::make('Product Images')
                                     ->columns(2)
-                                    ->description('Upload images of the product, the first image will be the primary image')
+                                    ->description('Upload images of the product. The first image will be set as the primary (cover) image.')
                                     ->schema([
-                                        FileUpload::make('images')
-                                            ->helperText('You can drag and drop to reorder the images (the first one will be primary)')
-                                            ->required()
-                                            ->multiple()
-                                            ->image()
-                                            ->imageEditor()
-                                            ->downloadable()
-                                            ->maxSize(2048)
-                                            ->reorderable()
+                                        Repeater::make('images')
+                                            ->relationship('images')
                                             ->columnSpanFull()
-                                            ->disk('public')
-                                            ->directory('products')
-                                            ->visibility('public')
-                                            ->saveRelationshipsUsing(function ($state, $record) {
-                                                $record->images()->delete();
-                                                if (is_array($state)) {
-                                                    foreach ($state as $index => $imagePath) {
-                                                        $record->images()->create([
-                                                            'image_path' => $imagePath,
-                                                            'alt_text' => $record->name,
-                                                            'is_primary' => $index === 0,
-                                                            'sort_order' => $index,
-                                                        ]);
-                                                    }
-                                                }
-                                            })
-                                            ->dehydrated(false),
+                                            ->reorderable('sort_order')
+                                            ->schema([
+                                                FileUpload::make('image_path')
+                                                    ->label('Image')
+                                                    ->image()
+                                                    ->preserveFilenames()
+                                                    ->imageEditor()
+                                                    ->downloadable()
+                                                    ->maxSize(2048)
+                                                    ->disk('public')
+                                                    ->directory('product-images')
+                                                    ->visibility('public')
+                                                    ->columnSpanFull(),
+                                                TextInput::make('alt_text')
+                                                    ->label('Alt Text')
+                                                    ->placeholder('Description for screen readers')
+                                                    ->maxLength(125)
+                                                    ->columnSpanFull(),
+                                                Toggle::make('is_primary')
+                                                    ->label('Primary Image')
+                                                    ->columnSpanFull(),
+                                            ])
+                                            ->itemLabel(fn($state) => $state['alt_text'] ?? 'Product Image')
+                                            ->collapsible()
+                                            ->defaultItems(0),
                                     ]),
                             ]),
                         Tab::make('Product Variants')
                             ->icon(Heroicon::Squares2x2)
                             ->schema([
+                                Toggle::make('has_variants')
+                                    ->required()
+                                    ->live(),
                                 Section::make('Product Variants')
-                                    ->columns(2)
+                                    ->description('Add variants to the product, like different sizes or colors')
+                                    ->columnSpanFull()
                                     ->schema([
-                                        Toggle::make('has_variants')
-                                            ->required()
-                                    ]),
+                                        Repeater::make('variants')
+                                            ->addActionLabel('Add variants to this product')
+                                            ->collapsible()
+                                            ->itemLabel(fn($state) => $state['name'] ?? 'New variant')
+                                            ->defaultItems(0)
+                                            ->columnSpanFull()
+                                            ->columns(2)
+                                            ->relationship('variants')
+                                            ->schema([
+                                                TextInput::make('name')
+                                                    ->required()
+                                                    ->label('Variant Name')
+                                                    ->placeholder('e.g. Red, Large'),
+                                                TextInput::make('sku')
+                                                    ->required()
+                                                    ->label('SKU')
+                                                    ->unique(ignoreRecord: true)
+                                                    ->helperText('Unique identifier for the variant')
+                                                    ->placeholder('e.g. RED-LARGE')
+                                                    ->default(function (callable $get) {
+                                                        $mainSku = $get('../../sku');
+                                                        return $mainSku ? $mainSku . '-NEW' : 'VAR-' . strtoupper(Str::random(4));
+                                                    }),
+                                                KeyValue::make('options')
+                                                    ->columnSpan(2),
+                                                TextInput::make('price')
+                                                    ->required()
+                                                    ->label('Price')
+                                                    ->numeric()
+                                                    ->prefix('EGP')
+                                                    ->minValue(0)
+                                                    ->placeholder('e.g. 100'),
+                                                TextInput::make('compare_price')
+                                                    ->required()
+                                                    ->label('Compare at Price')
+                                                    ->numeric()
+                                                    ->prefix('EGP')
+                                                    ->minValue(0)
+                                                    ->placeholder('e.g. 100'),
+                                                TextInput::make('stock_quantity')
+                                                    ->required()
+                                                    ->label('Stock Quantity')
+                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->default(0)
+                                                    ->placeholder('e.g. 10'),
+                                                Select::make('stock_status')
+                                                    ->options([
+                                                        'in_stock' => 'In Stock',
+                                                        'out_of_stock' => 'Out of Stock',
+                                                        'low_stock' => 'Low Stock',
+                                                        'on_backorder' => 'On Backorder',
+                                                    ])
+                                                    ->default('in_stock')
+                                                    ->required()
+                                                    ->native(false),
+                                                Toggle::make('is_active')
+                                                    ->default(true)
+                                                    ->required(),
+                                            ])
+                                            ->required(),
+                                    ])
+                                    ->visible(fn($get) => $get('has_variants')),
+
+
                             ]),
                         Tab::make('Settings')
                             ->icon(Heroicon::Cog)
@@ -219,12 +290,9 @@ class ProductsForm
                                     ->columns(2)
                                     ->schema([
                                         Placeholder::make('views_count')
-                                            ->content(fn($record) => $record?->view_count ?? 0),
+                                            ->content(fn($record) => $record?->views_count ?? 0),
                                         Placeholder::make('created_at')
                                             ->content(fn($record) => $record?->created_at?->diffForHumans() ?? 'N/A'),
-                                        Placeholder::make('updated_at')
-                                            ->content(fn($record) => $record?->updated_at?->diffForHumans() ?? 'N/A'),
-
                                     ]),
                             ]),
                         Tab::make('SEO & Metadata')
