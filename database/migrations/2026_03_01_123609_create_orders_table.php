@@ -26,7 +26,8 @@ return new class extends Migration
             $table->decimal('total', 10, 2);
 
             // Status (Current Status for quick filtering)
-            $table->enum('order_status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'])->default('pending');
+            $table->enum('order_status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'])->default('pending')->index();
+            $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending')->index();
 
             // Internal tracking
             $table->string('customer_ip', 45)->nullable(); // IPv4 max 15 char, IPv6 max 45 char.

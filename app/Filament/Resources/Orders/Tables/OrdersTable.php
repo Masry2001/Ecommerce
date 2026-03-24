@@ -42,9 +42,28 @@ class OrdersTable
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('order_status')
-                    ->badge(),
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'pending' => 'gray',
+                        'processing' => 'warning',
+                        'shipped' => 'info',
+                        'delivered' => 'success',
+                        'cancelled' => 'danger',
+                        'returned' => 'danger',
+                    })
+                    ->sortable(),
+                TextColumn::make('payment_status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'pending' => 'gray',
+                        'paid' => 'success',
+                        'failed' => 'danger',
+                        'refunded' => 'warning',
+                    })
+                    ->sortable(),
                 TextColumn::make('customer_ip')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -60,6 +79,22 @@ class OrdersTable
             ])
             ->filters([
                 TrashedFilter::make(),
+                \Filament\Tables\Filters\SelectFilter::make('order_status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'processing' => 'Processing',
+                        'shipped' => 'Shipped',
+                        'delivered' => 'Delivered',
+                        'cancelled' => 'Cancelled',
+                        'returned' => 'Returned',
+                    ]),
+                \Filament\Tables\Filters\SelectFilter::make('payment_status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'paid' => 'Paid',
+                        'failed' => 'Failed',
+                        'refunded' => 'Refunded',
+                    ]),
             ])
             ->recordActions([
                 EditAction::make(),

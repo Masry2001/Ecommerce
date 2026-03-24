@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('order_id')->constrained('orders', 'id')->cascadeOnDelete();
             $table->foreignUuid('user_id')->nullable()->constrained('users', 'id')->nullOnDelete();
-            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'])->default('pending');
+            $table->enum('order_status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'])->default('pending');
             $table->string('notes', 2000)->nullable();
             $table->timestamps();
         });

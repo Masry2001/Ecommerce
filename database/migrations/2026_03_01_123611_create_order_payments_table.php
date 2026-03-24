@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('order_id')->unique()->constrained('orders')->cascadeOnDelete();
 
-            $table->enum('payment_method', ['stripe', 'paypal', 'cash_on_delivery'])->default('stripe');
+            $table->enum('payment_method', ['paymob', 'stripe', 'paypal', 'cash_on_delivery'])->default('paymob');
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
             $table->string('transaction_id', 100)->nullable();
             $table->decimal('amount', 10, 2);

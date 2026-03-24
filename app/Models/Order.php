@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -32,12 +33,13 @@ class Order extends Model
         'tax_amount',
         'total',
         'order_status',
+        'payment_status',
         'customer_ip',
     ];
 
     // Scopes
     #[Scope]
-    protected function ofStatus(Builder $query, string $status): void
+    protected function ofOrderStatus(Builder $query, string $status): void
     {
         $query->where('order_status', $status);
     }
@@ -82,9 +84,7 @@ class Order extends Model
     #[Scope]
     protected function ofPaymentStatus(Builder $query, string $status): void
     {
-        $query->whereHas('payment', function ($q) use ($status) {
-            $q->where('payment_status', $status);
-        });
+        $query->where('payment_status', $status);
     }
 
     // helper methods
@@ -108,18 +108,33 @@ class Order extends Model
         ]));
     }
 
-    public function updateStatus($newStatus, $notes = null, $userId = null)
+    public function updateOrderStatus($newStatus, $notes = null, $userId = null)
     {
-        // 1. Update the current order status
-        $this->update(['order_status' => $newStatus]);
+        return DB::transaction(function () use ($newStatus, $notes, $userId) {
+            // 1. Update the current order status
+            $this->update(['order_status' => $newStatus]);
 
-        // 2. Create a history record (using the relationship)
-        $this->statusHistories()->create([
-            // order_id is set automatically by the relationship
-            'status'  => $newStatus,
-            'notes'   => $notes,
-            'user_id' => $userId,
-        ]);
+            // 2. Create a history record
+            return $this->statusHistories()->create([
+                'order_status' => $newStatus,
+                'notes'        => $notes,
+                'user_id'      => $userId,
+            ]);
+        });
+    }
+
+    public function updatePaymentStatus($newStatus)
+    {
+        return DB::transaction(function () use ($newStatus) {
+            // 1. Update the current payment status on Order
+            $this->update(['payment_status' => $newStatus]);
+
+            // 2. Update the status on the related OrderPayment
+            if ($this->payment) {
+                $this->payment->update(['payment_status' => $newStatus]);
+            }
+            return true;
+        });
     }
 
     protected static function boot()
@@ -135,7 +150,7 @@ class Order extends Model
         static::created(function ($order) {
             // Create history record
             $order->statusHistories()->create([
-                'status' => $order->order_status,
+                'order_status' => $order->order_status,
                 'notes' => 'Order created',
             ]);
         });
