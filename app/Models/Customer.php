@@ -45,17 +45,18 @@ class Customer extends Model
     }
 
     #[Scope]
-    public function active(Builder $query)
+    protected function active(Builder $query)
     {
         $query->where('is_active', true);
     }
 
     #[Scope]
-    public function inactive(Builder $query)
+    protected function inactive(Builder $query)
     {
         $query->where('is_active', false);
     }
 
+    // relations
     public function orders()
     {
         return $this->hasMany(Order::class);

@@ -43,19 +43,19 @@ class ProductVariant extends Model
 
     // local scopes
     #[Scope]
-    public function active(Builder $query)
+    protected function active(Builder $query)
     {
         return $query->where('is_active', true);
     }
 
     #[Scope]
-    public function inStock(Builder $query)
+    protected function inStock(Builder $query)
     {
         return $query->where('stock_quantity', '>', 0)->where('stock_status', 'in_stock');
     }
 
     #[Scope]
-    public function outOfStock(Builder $query)
+    protected function outOfStock(Builder $query)
     {
         return $query->where('stock_quantity', '=', 0)->where('stock_status', 'out_of_stock');
     }

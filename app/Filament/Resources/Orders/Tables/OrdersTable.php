@@ -10,6 +10,8 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use App\Models\Order;
+use Filament\Tables\Filters\SelectFilter;
 
 class OrdersTable
 {
@@ -17,36 +19,48 @@ class OrdersTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label('ID')
-                    ->searchable(),
-                TextColumn::make('customer_id')
-                    ->searchable(),
-                TextColumn::make('coupon_id')
-                    ->searchable(),
                 TextColumn::make('order_number')
+                    ->sortable()
+                    ->weight('bold')
+                    ->copyable()
                     ->searchable(),
+                TextColumn::make('customer.name')
+                    ->label('Customer')
+                    ->searchable()
+                    ->color('primary')
+                    ->url(fn(Order $record): ?string => $record->customer_id ? route('filament.admin.resources.customers.edit', $record->customer_id) : null),
+                TextColumn::make('coupon.code')
+                    ->label('Coupon')
+                    ->searchable()
+                    ->color('primary')
+                    ->url(fn(Order $record): ?string => $record->coupon_id ? route('filament.admin.resources.coupons.edit', $record->coupon_id) : null),
                 TextColumn::make('subtotal')
-                    ->numeric()
-                    ->sortable(),
+                    ->money('EGP')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('discount_amount')
-                    ->numeric()
-                    ->sortable(),
+                    ->money('EGP')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('shipping_cost')
-                    ->money()
-                    ->sortable(),
+                    ->money('EGP')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('tax_amount')
-                    ->numeric()
-                    ->sortable(),
+                    ->money('EGP')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('total')
-                    ->numeric()
+                    ->money('EGP')
+                    ->color('success')
+                    ->weight('bold')
                     ->sortable(),
                 TextColumn::make('order_status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'pending' => 'gray',
-                        'processing' => 'warning',
-                        'shipped' => 'info',
+                        'processing' => 'info',
+                        'shipped' => 'warning',
                         'delivered' => 'success',
                         'cancelled' => 'danger',
                         'returned' => 'danger',
@@ -61,6 +75,13 @@ class OrdersTable
                         'refunded' => 'warning',
                     })
                     ->sortable(),
+                TextColumn::make('tracking_number')
+                    ->copyable()
+                    ->searchable(),
+                TextColumn::make('items_count')
+                    ->counts('orderItems')
+                    ->badge()
+                    ->color('info'),
                 TextColumn::make('customer_ip')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -77,9 +98,10 @@ class OrdersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                TrashedFilter::make(),
-                \Filament\Tables\Filters\SelectFilter::make('order_status')
+                TrashedFilter::make()->native(false),
+                SelectFilter::make('order_status')
                     ->options([
                         'pending' => 'Pending',
                         'processing' => 'Processing',
@@ -87,14 +109,18 @@ class OrdersTable
                         'delivered' => 'Delivered',
                         'cancelled' => 'Cancelled',
                         'returned' => 'Returned',
-                    ]),
-                \Filament\Tables\Filters\SelectFilter::make('payment_status')
+                    ])
+                    ->multiple()
+                    ->native(false),
+                SelectFilter::make('payment_status')
                     ->options([
                         'pending' => 'Pending',
                         'paid' => 'Paid',
                         'failed' => 'Failed',
                         'refunded' => 'Refunded',
-                    ]),
+                    ])
+                    ->multiple()
+                    ->native(false),
             ])
             ->recordActions([
                 EditAction::make(),

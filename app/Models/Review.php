@@ -40,19 +40,19 @@ class Review extends Model
 
     // scopes
     #[Scope]
-    public function approved(Builder $query)
+    protected function approved(Builder $query)
     {
         return $query->where('is_approved', true);
     }
 
     #[Scope]
-    public function verified(Builder $query)
+    protected function verified(Builder $query)
     {
         return $query->where('is_verified_purchase', true);
     }
 
     #[Scope]
-    public function rating(Builder $query, int $rating)
+    protected function rating(Builder $query, int $rating)
     {
         return $query->where('rating', $rating);
     }

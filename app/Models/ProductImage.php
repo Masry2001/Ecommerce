@@ -34,7 +34,7 @@ class ProductImage extends Model
 
     // local scopes
     #[Scope]
-    public function primary(Builder $query)
+    protected function primary(Builder $query)
     {
         return $query->where('is_primary', true);
     }

@@ -25,7 +25,7 @@ class Settings extends Model
 
     // scopes
     #[Scope]
-    public function group(Builder $query, string $group)
+    protected function group(Builder $query, string $group)
     {
         return $query->where('group', $group);
     }

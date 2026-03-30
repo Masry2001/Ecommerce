@@ -132,6 +132,7 @@ class ProductsTable
                     ->dateTime('M d, Y')
                     ->sortable(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 TrashedFilter::make(),
             ])

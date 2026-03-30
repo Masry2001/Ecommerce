@@ -71,37 +71,37 @@ class Product extends Model
     }
 
     #[Scope]
-    public function active(Builder $query)
+    protected function active(Builder $query)
     {
         return $query->where('is_active', true);
     }
 
     #[Scope]
-    public function featured(Builder $query)
+    protected function featured(Builder $query)
     {
         return $query->where('is_featured', true);
     }
 
     #[Scope]
-    public function inStock(Builder $query)
+    protected function inStock(Builder $query)
     {
         return $query->where('stock_status', 'in_stock')->where('stock_quantity', '>', 0);
     }
 
     #[Scope]
-    public function outOfStock(Builder $query)
+    protected function outOfStock(Builder $query)
     {
         return $query->where('stock_status', 'out_of_stock')->where('stock_quantity', 0);
     }
 
     #[Scope]
-    public function lowStock(Builder $query)
+    protected function lowStock(Builder $query)
     {
-        return $query->where('stock_status', 'low_stock')->where('stock_quantity', '<=', 'low_stock_threshold')->where('stock_quantity', '>', 0);
+        return $query->where('stock_status', 'low_stock')->whereColumn('stock_quantity', '<=', 'low_stock_threshold')->where('stock_quantity', '>', 0);
     }
 
     #[Scope]
-    public function onBackorder(Builder $query)
+    protected function onBackorder(Builder $query)
     {
         return $query->where('stock_status', 'on_backorder');
     }
@@ -113,49 +113,49 @@ class Product extends Model
     }
 
     #[Scope]
-    public function hasVariants(Builder $query)
+    protected function hasVariants(Builder $query)
     {
         return $query->where('has_variants', true);
     }
 
     #[Scope]
-    public function hasNoVariants(Builder $query)
+    protected function hasNoVariants(Builder $query)
     {
         return $query->where('has_variants', false);
     }
 
     #[Scope]
-    public function withLowStock(Builder $query)
+    protected function withLowStock(Builder $query)
     {
-        return $query->where('stock_quantity', '<', 'low_stock_threshold');
+        return $query->whereColumn('stock_quantity', '<', 'low_stock_threshold');
     }
 
     #[Scope]
-    public function withoutLowStock(Builder $query)
+    protected function withoutLowStock(Builder $query)
     {
-        return $query->where('stock_quantity', '>=', 'low_stock_threshold');
+        return $query->whereColumn('stock_quantity', '>=', 'low_stock_threshold');
     }
 
     #[Scope]
-    public function withManageStock(Builder $query)
+    protected function withManageStock(Builder $query)
     {
         return $query->where('manage_stock', true);
     }
 
     #[Scope]
-    public function withoutManageStock(Builder $query)
+    protected function withoutManageStock(Builder $query)
     {
         return $query->where('manage_stock', false);
     }
 
     #[Scope]
-    public function withStockStatus(Builder $query, string $status)
+    protected function withStockStatus(Builder $query, string $status)
     {
         return $query->where('stock_status', $status);
     }
 
     #[Scope]
-    public function withoutStockStatus(Builder $query, string $status)
+    protected function withoutStockStatus(Builder $query, string $status)
     {
         return $query->where('stock_status', '!=', $status);
     }
