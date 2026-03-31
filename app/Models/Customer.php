@@ -2,19 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use App\Models\Review;
-use App\Models\Address;
-use App\Models\CouponUsage;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Customer extends Model
+class Customer extends Authenticatable
 {
-    use SoftDeletes;
-    use HasUuids;
+    use HasApiTokens, Notifiable, SoftDeletes, HasUuids;
     public $incrementing = false;
     protected $keyType = 'string';
     protected $table = 'customers';
