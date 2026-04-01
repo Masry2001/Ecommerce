@@ -31,7 +31,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement('ALTER TABLE coupon_usages ADD CONSTRAINT chk_coupon_discount_amount_positive CHECK (discount_amount >= 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE coupon_usages ADD CONSTRAINT chk_coupon_discount_amount_positive CHECK (discount_amount >= 0)');
+        }
     }
 
     /**

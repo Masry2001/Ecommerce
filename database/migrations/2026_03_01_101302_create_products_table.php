@@ -40,11 +40,13 @@ return new class extends Migration
         });
 
 
-        DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_price_positive CHECK (price >= 0)');
-        DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_compare_price_positive CHECK (compare_price >= 0)');
-        DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_cost_price_positive CHECK (cost_price >= 0)');
-        DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_stock_quantity_positive CHECK (stock_quantity >= 0)');
-        DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_low_stock_threshold_positive CHECK (low_stock_threshold >= 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_price_positive CHECK (price >= 0)');
+            DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_compare_price_positive CHECK (compare_price >= 0)');
+            DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_cost_price_positive CHECK (cost_price >= 0)');
+            DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_stock_quantity_positive CHECK (stock_quantity >= 0)');
+            DB::statement('ALTER TABLE products ADD CONSTRAINT chk_product_low_stock_threshold_positive CHECK (low_stock_threshold >= 0)');
+        }
     }
 
     /**

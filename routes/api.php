@@ -2,10 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\CustomerAuthController;
+use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\BrandController;
 
 Route::prefix('v1')->group(function () {
     Route::post('/register', [CustomerAuthController::class, 'register']);
     Route::post('/login', [CustomerAuthController::class, 'login']);
+
+    // Catalog Routes
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories/{slug}', [CategoryController::class, 'show']);
+    Route::get('/brands', [BrandController::class, 'index']);
+    Route::get('/brands/{slug}', [BrandController::class, 'show']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/customer', [CustomerAuthController::class, 'customer']);

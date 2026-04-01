@@ -29,11 +29,13 @@ return new class extends Migration
 
         // Add the CHECK constraints using a raw statement, because Laravel12 doesn't support CHECK constraints directly.
         // and i don't want to use unsignedDecimal because it's deprecated since MySQL 8.0.17
-        DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_value_positive CHECK (value >= 0)');
-        DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_min_order_positive CHECK (min_order_value >= 0)');
-        DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_max_discount_positive CHECK (max_discount >= 0)');
-        DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_usage_limit_positive CHECK (usage_limit >= 0)');
-        DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_usage_limit_per_customer_positive CHECK (usage_limit_per_customer >= 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_value_positive CHECK (value >= 0)');
+            DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_min_order_positive CHECK (min_order_value >= 0)');
+            DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_max_discount_positive CHECK (max_discount >= 0)');
+            DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_usage_limit_positive CHECK (usage_limit >= 0)');
+            DB::statement('ALTER TABLE coupons ADD CONSTRAINT chk_coupon_usage_limit_per_customer_positive CHECK (usage_limit_per_customer >= 0)');
+        }
     }
 
     /**

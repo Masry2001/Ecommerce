@@ -38,11 +38,13 @@ return new class extends Migration
 
         // Add the CHECK constraints using a raw statement, because Laravel12 doesn't support CHECK constraints directly.
         // and i don't want to use unsignedDecimal because it's deprecated since MySQL 8.0.17
-        DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_subtotal_positive CHECK (subtotal >= 0)');
-        DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_discount_positive CHECK (discount_amount >= 0)');
-        DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_shipping_positive CHECK (shipping_cost >= 0)');
-        DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_tax_positive CHECK (tax_amount >= 0)');
-        DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_total_positive CHECK (total >= 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_subtotal_positive CHECK (subtotal >= 0)');
+            DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_discount_positive CHECK (discount_amount >= 0)');
+            DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_shipping_positive CHECK (shipping_cost >= 0)');
+            DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_tax_positive CHECK (tax_amount >= 0)');
+            DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_order_total_positive CHECK (total >= 0)');
+        }
     }
 
     /**

@@ -27,7 +27,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement('ALTER TABLE order_payments ADD CONSTRAINT chk_order_payment_amount_positive CHECK (amount >= 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE order_payments ADD CONSTRAINT chk_order_payment_amount_positive CHECK (amount >= 0)');
+        }
     }
 
     /**

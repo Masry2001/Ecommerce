@@ -8,11 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-class CustomerAuthController extends Controller
+use App\Http\Controllers\Api\V1\Interfaces\CustomerAuthDocumentation;
+
+class CustomerAuthController extends Controller implements CustomerAuthDocumentation
 {
-    /**
-     * Register a new customer.
-     */
     public function register(Request $request)
     {
         $request->validate([
@@ -43,9 +42,6 @@ class CustomerAuthController extends Controller
         ], 201);
     }
 
-    /**
-     * Login a customer.
-     */
     public function login(Request $request)
     {
         $request->validate([
@@ -76,9 +72,6 @@ class CustomerAuthController extends Controller
         ]);
     }
 
-    /**
-     * Logout a customer.
-     */
     public function logout(Request $request)
     {
         // By default, Sanctum attaches the user to $request->user() regardless of the model name
@@ -91,9 +84,6 @@ class CustomerAuthController extends Controller
         ]);
     }
 
-    /**
-     * Get the authenticated customer.
-     */
     public function customer(Request $request)
     {
         return response()->json($request->user());

@@ -27,8 +27,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement('ALTER TABLE order_items ADD CONSTRAINT chk_order_item_price_positive CHECK (price >= 0)');
-        DB::statement('ALTER TABLE order_items ADD CONSTRAINT chk_order_item_subtotal_positive CHECK (subtotal >= 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE order_items ADD CONSTRAINT chk_order_item_price_positive CHECK (price >= 0)');
+            DB::statement('ALTER TABLE order_items ADD CONSTRAINT chk_order_item_subtotal_positive CHECK (subtotal >= 0)');
+        }
     }
 
     /**

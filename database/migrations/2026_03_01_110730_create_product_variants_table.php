@@ -27,8 +27,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement('ALTER TABLE product_variants ADD CONSTRAINT chk_product_variant_price_positive CHECK (price >= 0)');
-        DB::statement('ALTER TABLE product_variants ADD CONSTRAINT chk_product_variant_compare_price_positive CHECK (compare_price >= 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE product_variants ADD CONSTRAINT chk_product_variant_price_positive CHECK (price >= 0)');
+            DB::statement('ALTER TABLE product_variants ADD CONSTRAINT chk_product_variant_compare_price_positive CHECK (compare_price >= 0)');
+        }
     }
 
     /**
