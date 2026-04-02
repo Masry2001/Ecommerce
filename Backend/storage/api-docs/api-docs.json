@@ -4,13 +4,13 @@
         "title": "E-commerce API",
         "description": "API documentation for the storefront and customer operations.",
         "contact": {
-            "email": "support@example.com"
+            "email": "mohamedhanymusa@gmail.com"
         },
         "version": "1.0.0"
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000/api/v1",
+            "url": "http://127.0.0.1:8000",
             "description": "API Server"
         }
     ],
@@ -345,6 +345,136 @@
                     }
                 ]
             }
+        },
+        "/api/v1/products": {
+            "get": {
+                "tags": [
+                    "Catalog"
+                ],
+                "summary": "List all active products with filters",
+                "operationId": "getProducts",
+                "parameters": [
+                    {
+                        "name": "category_slug",
+                        "in": "query",
+                        "description": "Filter by category slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "brand_slug",
+                        "in": "query",
+                        "description": "Filter by brand slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "is_featured",
+                        "in": "query",
+                        "description": "Filter by featured status",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "description": "Filter by minimum price",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "max_price",
+                        "in": "query",
+                        "description": "Filter by maximum price",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Keyword search in name/description",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort order (latest, price_low, price_high, popular)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Product"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/products/{slug}": {
+            "get": {
+                "tags": [
+                    "Catalog"
+                ],
+                "summary": "Get a single product by slug",
+                "operationId": "getProductBySlug",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "The slug of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Product"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -436,6 +566,103 @@
                     "sort_order": {
                         "type": "integer",
                         "example": 1
+                    },
+                    "meta_title": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "meta_description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Product": {
+                "title": "Product",
+                "description": "Product model",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "iPhone 15 Pro"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "example": "iphone-15-pro"
+                    },
+                    "sku": {
+                        "type": "string",
+                        "example": "SKU-IPHONE15"
+                    },
+                    "short_description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 999.99
+                    },
+                    "compare_price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1099.99,
+                        "nullable": true
+                    },
+                    "discount_percentage": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "stock_status": {
+                        "type": "string",
+                        "example": "in_stock"
+                    },
+                    "stock_quantity": {
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "views_count": {
+                        "type": "integer",
+                        "example": 150
+                    },
+                    "average_rating": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 4.5
+                    },
+                    "reviews_count": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "primary_image": {
+                        "type": "string",
+                        "format": "url",
+                        "nullable": true
+                    },
+                    "category": {
+                        "$ref": "#/components/schemas/Category"
+                    },
+                    "brand": {
+                        "$ref": "#/components/schemas/Brand"
                     },
                     "meta_title": {
                         "type": "string",

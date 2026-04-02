@@ -18,10 +18,12 @@ class BrandResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
+
             'description' => $this->description,
-            'logo_url' => $this->logo ? asset('storage/' . $this->logo) : null,
+            'logo' => $this->logo ? asset('storage/' . $this->logo) : null,
             'website' => $this->website,
             'sort_order' => $this->sort_order,
+            'is_active' => $this->is_active,
             'meta_title' => $this->meta_title,
             'meta_description' => $this->meta_description,
             'created_at' => $this->created_at,

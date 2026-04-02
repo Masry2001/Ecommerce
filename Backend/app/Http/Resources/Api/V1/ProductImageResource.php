@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class ProductImageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,14 +16,11 @@ class CategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'slug' => $this->slug,
-            'description' => $this->description,
-            'image' => $this->image ? asset('storage/' . $this->image) : null,
+            'product_id' => $this->product_id,
+            'image' => asset('storage/' . $this->image_path),
+            'alt_text' => $this->alt_text,
+            'is_primary' => $this->is_primary,
             'sort_order' => $this->sort_order,
-            'is_active' => $this->is_active,
-            'meta_title' => $this->meta_title,
-            'meta_description' => $this->meta_description,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

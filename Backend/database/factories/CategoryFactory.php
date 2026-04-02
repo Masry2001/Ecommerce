@@ -26,7 +26,7 @@ class CategoryFactory extends Factory
             'is_active' => true,
             'sort_order' => $this->faker->numberBetween(0, 100),
             'meta_title' => $this->faker->sentence(),
-            'meta_description' => $this->faker->paragraph(),
+            'meta_description' => $this->faker->text(200),
         ];
     }
 }
