@@ -9,6 +9,10 @@ use App\Http\Controllers\Api\V1\ProductController;
 Route::prefix('v1')->group(function () {
     Route::post('/register', [CustomerAuthController::class, 'register']);
     Route::post('/login', [CustomerAuthController::class, 'login']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/customer', [CustomerAuthController::class, 'customer']);
+        Route::post('/logout', [CustomerAuthController::class, 'logout']);
+    });
 
     // Catalog Routes
     Route::get('/categories', [CategoryController::class, 'index']);
@@ -17,9 +21,4 @@ Route::prefix('v1')->group(function () {
     Route::get('/brands/{slug}', [BrandController::class, 'show']);
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/{slug}', [ProductController::class, 'show']);
-
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/customer', [CustomerAuthController::class, 'customer']);
-        Route::post('/logout', [CustomerAuthController::class, 'logout']);
-    });
 });
