@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api\V1\Interfaces;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Api\V1\RegisterCustomerRequest;
+use App\Http\Requests\Api\V1\LoginCustomerRequest;
 use OpenApi\Attributes as OA;
 
 interface CustomerAuthDocumentation
@@ -43,7 +46,7 @@ interface CustomerAuthDocumentation
             new OA\Response(response: 422, description: "Validation error"),
         ]
     )]
-    public function register(Request $request);
+    public function register(RegisterCustomerRequest $request): JsonResponse;
 
     #[OA\Post(
         path: "/api/v1/login",
@@ -74,7 +77,7 @@ interface CustomerAuthDocumentation
             new OA\Response(response: 401, description: "Invalid credentials"),
         ]
     )]
-    public function login(Request $request);
+    public function login(LoginCustomerRequest $request): JsonResponse;
 
     #[OA\Post(
         path: "/api/v1/logout",
@@ -95,7 +98,7 @@ interface CustomerAuthDocumentation
             new OA\Response(response: 401, description: "Unauthenticated"),
         ]
     )]
-    public function logout(Request $request);
+    public function logout(Request $request): JsonResponse;
 
     #[OA\Get(
         path: "/api/v1/customer",
@@ -112,5 +115,5 @@ interface CustomerAuthDocumentation
             new OA\Response(response: 401, description: "Unauthenticated"),
         ]
     )]
-    public function customer(Request $request);
+    public function customer(Request $request): JsonResponse;
 }

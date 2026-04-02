@@ -29,7 +29,7 @@ class BrandTest extends TestCase
                         'name',
                         'slug',
                         'description',
-                        'logo_url',
+                        'logo',
                         'website',
                         'sort_order',
                         'meta_title',

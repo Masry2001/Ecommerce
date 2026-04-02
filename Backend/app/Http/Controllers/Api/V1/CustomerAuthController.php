@@ -5,23 +5,18 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\Api\V1\RegisterCustomerRequest;
+use App\Http\Requests\Api\V1\LoginCustomerRequest;
 
 use App\Http\Controllers\Api\V1\Interfaces\CustomerAuthDocumentation;
 
 class CustomerAuthController extends Controller implements CustomerAuthDocumentation
 {
-    public function register(Request $request)
+    public function register(RegisterCustomerRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:customers',
-            'phone' => 'nullable|string|max:255',
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|string|in:male,female,other',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
 
         $customer = Customer::create([
             'name' => $request->name,
@@ -42,12 +37,8 @@ class CustomerAuthController extends Controller implements CustomerAuthDocumenta
         ], 201);
     }
 
-    public function login(Request $request)
+    public function login(LoginCustomerRequest $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
 
         $customer = Customer::where('email', $request->email)->first();
 
@@ -72,7 +63,7 @@ class CustomerAuthController extends Controller implements CustomerAuthDocumenta
         ]);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         // By default, Sanctum attaches the user to $request->user() regardless of the model name
         // so use the $request->user() not $request->customer().
@@ -84,7 +75,7 @@ class CustomerAuthController extends Controller implements CustomerAuthDocumenta
         ]);
     }
 
-    public function customer(Request $request)
+    public function customer(Request $request): JsonResponse
     {
         return response()->json($request->user());
     }

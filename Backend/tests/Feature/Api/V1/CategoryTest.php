@@ -29,7 +29,7 @@ class CategoryTest extends TestCase
                         'name',
                         'slug',
                         'description',
-                        'image_url',
+                        'image',
                         'sort_order',
                         'meta_title',
                         'meta_description',
